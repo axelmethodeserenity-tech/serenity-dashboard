@@ -1,0 +1,214 @@
+/* ============================================================
+   SERENITY — Design Foundations
+   Patrimoine premium · Dark-first · Anthracite + Glacial Teal
+   Typography: Spectral (serif display) + Manrope (sans UI/figures)
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  /* ---------- TYPE FAMILIES ---------- */
+  --font-serif: 'Spectral', 'Spectral', Georgia, 'Times New Roman', serif;
+  --font-sans:  'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono:  'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+
+  /* ---------- BACKGROUNDS (dark canvas) ---------- */
+  --bg-0:  #08090B;   /* deepest ink — page edges, behind everything */
+  --bg-1:  #0C0E12;   /* base canvas */
+  --surface-1: #12151B;  /* cards on canvas */
+  --surface-2: #181C23;  /* nested / inputs */
+  --surface-3: #1F242C;  /* raised / overlays / menus */
+  --surface-hover: #232932;
+
+  /* ---------- HAIRLINES & BORDERS ---------- */
+  --line-1: rgba(255,255,255,0.07);  /* default divider */
+  --line-2: rgba(255,255,255,0.12);  /* emphasized border */
+  --line-3: rgba(255,255,255,0.18);  /* focus / strong */
+
+  /* ---------- TEXT ---------- */
+  --fg-1: #F1F4F7;   /* primary */
+  --fg-2: #AAB4C0;   /* secondary */
+  --fg-3: #6E7884;   /* muted / captions */
+  --fg-4: #474F5A;   /* faint / disabled */
+  --fg-on-accent: #04201C;  /* text on teal fills */
+
+  /* ---------- BRAND ACCENT — glacial teal ---------- */
+  --accent:        #3FDBC2;  /* primary brand teal */
+  --accent-bright: #5FE9D2;  /* hover / glow */
+  --accent-strong: #1FA992;  /* pressed / text-on-light */
+  --accent-deep:   #0E6D5E;  /* deep tint */
+  --accent-soft:   rgba(63,219,194,0.13);   /* tinted surfaces */
+  --accent-line:   rgba(63,219,194,0.34);   /* tinted borders */
+  --accent-glow:   rgba(63,219,194,0.22);
+
+  /* ---------- COOL SECONDARY — steel azure (charts/links) ---------- */
+  --azure:      #5AA2F5;
+  --azure-soft: rgba(90,162,245,0.13);
+
+  /* ---------- SEMANTIC ---------- */
+  --gain:   #3FDBC2;   /* recovered / optimized (= accent) */
+  --gain-soft: rgba(63,219,194,0.13);
+  --leak:   #E8A24D;   /* "manque à gagner" / dormant — warm amber */
+  --leak-soft: rgba(232,162,77,0.14);
+  --danger: #EC6A56;   /* loss / error / critical fee */
+  --danger-soft: rgba(236,106,86,0.14);
+  --neutral-chip: rgba(255,255,255,0.06);
+
+  /* ---------- RADII ---------- */
+  --r-xs: 6px;
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --r-xl: 28px;
+  --r-2xl: 36px;
+  --r-full: 999px;
+
+  /* ---------- SPACING (4pt base) ---------- */
+  --s-1: 4px;  --s-2: 8px;  --s-3: 12px; --s-4: 16px;
+  --s-5: 20px; --s-6: 24px; --s-7: 32px; --s-8: 40px;
+  --s-9: 48px; --s-10: 64px; --s-11: 80px; --s-12: 112px;
+
+  /* ---------- SHADOWS (dark, restrained) ---------- */
+  --shadow-1: 0 1px 2px rgba(0,0,0,0.40);
+  --shadow-2: 0 10px 28px -10px rgba(0,0,0,0.62);
+  --shadow-3: 0 28px 64px -18px rgba(0,0,0,0.72);
+  --shadow-glow: 0 0 0 1px var(--accent-line), 0 10px 34px -10px var(--accent-glow);
+  --shadow-inset: inset 0 1px 0 rgba(255,255,255,0.04);
+
+  /* ---------- MOTION ---------- */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 130ms;
+  --dur: 220ms;
+  --dur-slow: 420ms;
+
+  /* ---------- TYPE SCALE (fluid) ---------- */
+  --t-display: clamp(44px, 5.4vw, 76px);
+  --t-h1: clamp(34px, 3.6vw, 52px);
+  --t-h2: clamp(26px, 2.6vw, 36px);
+  --t-h3: 24px;
+  --t-h4: 19px;
+  --t-body-lg: 19px;
+  --t-body: 16px;
+  --t-sm: 14px;
+  --t-xs: 13px;
+  --t-2xs: 11px;
+}
+
+/* ============================================================
+   SEMANTIC ELEMENT STYLES (opt-in via classes)
+   ============================================================ */
+
+.ser-display {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-size: var(--t-display);
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+  color: var(--fg-1);
+  text-wrap: balance;
+}
+.ser-h1 {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: var(--t-h1);
+  line-height: 1.08;
+  letter-spacing: -0.018em;
+  color: var(--fg-1);
+  text-wrap: balance;
+}
+.ser-h2 {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: var(--t-h2);
+  line-height: 1.14;
+  letter-spacing: -0.012em;
+  color: var(--fg-1);
+}
+.ser-h3 {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: var(--t-h3);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: var(--fg-1);
+}
+.ser-eyebrow {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: var(--t-2xs);
+  line-height: 1;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.ser-overline {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: var(--t-2xs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+.ser-body-lg {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--t-body-lg);
+  line-height: 1.6;
+  color: var(--fg-2);
+}
+.ser-body {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--t-body);
+  line-height: 1.62;
+  color: var(--fg-2);
+}
+.ser-sm {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: var(--t-sm);
+  line-height: 1.5;
+  color: var(--fg-2);
+}
+.ser-label {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: var(--t-xs);
+  letter-spacing: 0.01em;
+  color: var(--fg-2);
+}
+/* Financial figures — tabular, lined numerals */
+.ser-figure {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: 'tnum' 1, 'lnum' 1, 'ss01' 1;
+  letter-spacing: -0.02em;
+  color: var(--fg-1);
+}
+.ser-figure-xl {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: 'tnum' 1, 'lnum' 1;
+  font-size: clamp(40px, 4.4vw, 60px);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--fg-1);
+}
+.ser-mono {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-xs);
+  letter-spacing: 0;
+  color: var(--fg-2);
+}
+
+/* convenience colour helpers */
+.ser-accent { color: var(--accent); }
+.ser-leak { color: var(--leak); }
+.ser-danger { color: var(--danger); }
+.ser-fg2 { color: var(--fg-2); }
+.ser-fg3 { color: var(--fg-3); }
