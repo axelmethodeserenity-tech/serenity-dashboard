@@ -80,10 +80,18 @@ html,body{margin:0;background:var(--bg-0);color:var(--fg-1);font-family:var(--fo
 .vers-banner.warn{background:var(--leak-soft);border:1px solid rgba(232,162,77,.34);color:var(--fg-2)}
 .vers-banner.warn svg{color:var(--leak)}
 
-/* intro */
-.intro-hero{max-width:760px;margin:36px auto 0;text-align:center;display:flex;flex-direction:column;align-items:center;gap:22px}
-.intro-title{font-family:var(--font-serif);font-weight:300;font-size:clamp(36px,4.4vw,56px);line-height:1.04;
+/* intro (plein écran) */
+.intro-stage{min-height:100vh;width:100%;display:flex;align-items:center;justify-content:center;
+  padding:48px 32px;box-sizing:border-box;
+  background:radial-gradient(130% 120% at 50% 0%, #11151c 0%, var(--bg-1) 55%, var(--bg-0) 100%)}
+.intro-hero{max-width:720px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:22px}
+.intro-mark{width:72px;height:72px;border-radius:20px;display:grid;place-items:center;
+  background:linear-gradient(160deg,#161b22,#0e1116);border:1px solid var(--line-2);box-shadow:var(--shadow-2)}
+.intro-title{font-family:var(--font-serif);font-weight:300;font-size:clamp(38px,5vw,60px);line-height:1.03;
   letter-spacing:-.02em;color:var(--fg-1);margin:0;text-wrap:balance}
+.intro-sub{font-size:18px;line-height:1.6;color:var(--fg-2);margin:0;max-width:600px}
+.intro-confid{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--fg-4);margin-top:4px}
+.btn-lg{font-size:16px;padding:15px 28px;margin-top:6px}
 
 /* cta band */
 .cta-band{display:flex;align-items:center;gap:24px;background:linear-gradient(120deg, rgba(63,219,194,.08), #0f1217 60%);border-color:var(--accent-line)}
@@ -180,6 +188,14 @@ html,body{margin:0;background:var(--bg-0);color:var(--fg-1);font-family:var(--fo
 .fld-in::-webkit-outer-spin-button,.fld-in::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .fld-in[type=number]{-moz-appearance:textfield}
 .fld-suf{font-size:14px;font-weight:600;color:var(--fg-3);padding-left:8px}
+/* stepper field (flèches +/-) — compactes */
+.stepper-wrap{padding:0 6px}
+.stepper-wrap.capped{border-color:rgba(232,162,77,.5)}
+.stp{width:22px;height:22px;flex:none;border-radius:6px;display:grid;place-items:center;cursor:pointer;
+  background:transparent;border:1px solid var(--line-2);color:var(--fg-3);transition:all var(--dur) var(--ease-out)}
+.stp:hover{background:var(--accent);border-color:transparent;color:#06231e}
+.stp .lic svg, .stp svg{width:12px;height:12px}
+.stp-in{text-align:center;padding-left:0;padding-right:0}
 .fld-sel{appearance:none;-webkit-appearance:none;cursor:pointer;padding-right:6px}
 .fld-sel option{background:var(--surface-3);color:var(--fg-1)}
 
@@ -189,13 +205,22 @@ html,body{margin:0;background:var(--bg-0);color:var(--fg-1);font-family:var(--fo
 
 /* list row cards */
 .row-card{position:relative;background:var(--surface-1);border:1px solid var(--line-1);border-radius:14px;
-  padding:18px 56px 18px 18px;margin-bottom:12px}
+  padding:46px 18px 18px;margin-bottom:12px}
 .row-card:last-of-type{margin-bottom:0}
 .row-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px}
-.row-del{position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:9px;display:grid;place-items:center;
-  background:var(--surface-2);border:1px solid var(--line-1);color:var(--fg-3);cursor:pointer;transition:all var(--dur) var(--ease-out)}
-.row-del:hover{color:var(--danger);border-color:rgba(236,106,86,.4);background:var(--danger-soft)}
-.row-del.sm{position:static;width:30px;height:30px}
+.row-del{position:absolute;top:14px;right:14px;height:30px;padding:0 12px;border-radius:8px;display:inline-flex;
+  align-items:center;gap:6px;font-family:var(--font-sans);font-size:12px;font-weight:700;
+  background:var(--danger-soft);border:1px solid rgba(236,106,86,.4);color:var(--danger);cursor:pointer;
+  transition:all var(--dur) var(--ease-out)}
+.row-del:hover{background:var(--danger);border-color:transparent;color:#fff}
+.row-del.sm{position:static;height:30px;padding:0 10px}
+/* bouton ajout bien visible */
+.btn-add{flex:none;background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent-line);
+  font-weight:700;padding:11px 18px}
+.btn-add:hover{background:var(--accent);border-color:transparent;color:#06231e;transform:translateY(-1px)}
+/* carte précaution */
+.precaution-card{display:flex;align-items:center;gap:24px;flex-wrap:wrap;
+  background:linear-gradient(120deg, rgba(63,219,194,.07), #0f1217 65%);border-color:var(--accent-line)}
 
 /* settings */
 .settings-banner{display:flex;align-items:center;gap:12px;background:var(--accent-soft);border:1px solid var(--accent-line);
@@ -235,10 +260,11 @@ html,body{margin:0;background:var(--bg-0);color:var(--fg-1);font-family:var(--fo
 .sheet .doc-eyebrow{font-size:11px;letter-spacing:.18em;text-transform:uppercase;font-weight:700;color:#1FA992}
 .sheet .doc-fig{font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.03em}
 .sheet .doc-line{border:none;border-top:1px solid #E4E0D5;margin:0}
-.sheet .doc-row{display:flex;align-items:baseline;justify-content:space-between;padding:11px 0;border-bottom:1px solid #ECE8DD}
-.sheet .doc-lab{font-size:14.5px;color:#2C343A;font-weight:600}
-.sheet .doc-sub{font-size:12.5px;color:#8A8676;margin-top:2px}
-.sheet .doc-val{font-weight:700;font-variant-numeric:tabular-nums;font-size:15px;color:#10161A}
+.sheet .doc-row{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;padding:11px 0;border-bottom:1px solid #ECE8DD}
+.sheet .doc-row>div:first-child{min-width:0}
+.sheet .doc-lab{font-size:14.5px;color:#2C343A;font-weight:600;line-height:1.35}
+.sheet .doc-sub{font-size:12.5px;color:#8A8676;margin-top:3px;line-height:1.35}
+.sheet .doc-val{font-weight:700;font-variant-numeric:tabular-nums;font-size:15px;color:#10161A;white-space:nowrap;flex:none;text-align:right}
 .sheet .doc-note{background:#F2EFE6;border-left:3px solid #1FA992;border-radius:8px;padding:14px 16px;
   font-size:13px;line-height:1.6;color:#3A4248}
 .sheet .doc-foot{font-size:11.5px;color:#9C9888;line-height:1.5}

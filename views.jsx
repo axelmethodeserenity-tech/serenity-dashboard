@@ -18,8 +18,11 @@ function BackLink({ setView }) {
 }
 
 /* ---------------- SYNTHÈSE ---------------- */
-function SynthesisView({ setView, audit }) {
+function SynthesisView({ setView, audit, projHorizon }) {
   const A = audit;
+  const projH = projHorizon || 15;
+  const projEcart = Math.round(A.patrimoineInvesti * Math.pow(1 + A.profilRate / 100, projH))
+    - Math.round(A.patrimoineInvesti * Math.pow(1 + A.perfActuelle / 100, projH));
   return (
     <div className="content fade-in">
       <SectionHead eyebrow="Diagnostic patrimonial · synthèse"
@@ -31,7 +34,8 @@ function SynthesisView({ setView, audit }) {
           <span className="eyebrow" style={{ color: 'var(--leak)' }}>Votre manque à gagner total</span>
           <div className="hero-fig" style={{ color: 'var(--leak)' }}>−{fmt(A.totals.leakPerYear)}<small>€/an</small></div>
           <div className="hero-note">
-            Soit <b style={{ color: 'var(--fg-1)' }}>{eur(A.totals.over10)}</b> sur 10 ans — qui ne financent aucun de vos projets.</div>
+            Soit <b style={{ color: 'var(--fg-1)' }}>{eur(A.totals.over10)}</b> sur {A.totals.over10ans} ans — qui ne financent aucun de vos projets.
+            {A.patrimoineInvesti > 0 && <> Et sur <b style={{ color: 'var(--fg-1)' }}>{projH} ans</b>, l'écart entre votre situation actuelle et une allocation optimisée atteint <b style={{ color: 'var(--accent)' }}>+{eur(projEcart)}</b>.</>}</div>
         </div>
         <div className="hero-r">
           <Donut size={150} stroke={18} segments={A.leaks.map(l => ({ value: Math.max(1, l.amount), color: l.stroke }))}>
@@ -87,7 +91,7 @@ function DormantView({ setView, audit }) {
             <StackBar height={14} parts={[{ value: Math.max(1, d.precaution), color: 'var(--accent)' }, { value: Math.max(0, d.surplus), color: 'var(--leak)' }]} />
           </div>
           <div style={{ display: 'flex', gap: 18, marginBottom: 8, flexWrap: 'wrap' }}>
-            <Legend color="#3FDBC2" label="Précaution (6 mois)" val={eur(d.precaution)} />
+            <Legend color="#3FDBC2" label="Précaution choisie" val={eur(d.precaution)} />
             <Legend color="#E8A24D" label="Surplus à investir" val={eur(d.surplus)} />
           </div>
           <div style={{ marginTop: 8 }}>
@@ -95,7 +99,7 @@ function DormantView({ setView, audit }) {
               <DataRow key={i} label={a.type} sub={audit.couple ? a.ownerName : a.sub} value={eur(a.montant)}
                 badge={<span className="chip" style={{ marginRight: 6 }}>{a.taux}%</span>} />
             ))}
-            <DataRow label="Épargne de précaution conseillée" sub={`${eur(d.precautionMin)} à ${eur(d.precaution)} (3–6 mois)`} value={eur(d.precaution)} valueColor="var(--accent)" />
+            <DataRow label="Épargne de précaution conseillée" sub={`${eur(d.precautionMin)} à ${eur(d.precautionMax)} (3–6 mois de dépenses)`} value={eur(d.precaution)} valueColor="var(--accent)" />
           </div>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
@@ -130,7 +134,8 @@ function AvView({ setView, audit }) {
           {av.contrats.map((c, i) => {
             const isOpen = !!open[c.id];
             const layers = [
-              { label: 'Frais de gestion du contrat', cur: c.fraisGestion || 0, opt: audit.settings.av.fraisGestionCible },
+              { label: 'Frais de gestion (unités de compte)', cur: c.gestUC || 0, opt: audit.settings.av.fraisGestionUCCible },
+              { label: 'Frais de gestion (fonds en euros)', cur: c.gestFE || 0, opt: audit.settings.av.fraisGestionFECible },
               { label: 'Frais des unités de compte', cur: c.fraisUC || 0, opt: audit.settings.av.fraisUCCible },
               { label: 'Frais sur versement', cur: c.fraisVersement || 0, opt: audit.settings.av.fraisVersementCible },
             ];

@@ -10,6 +10,7 @@
       p2Nom: '', p2Age: 0,
       revenuFoyer: 0,
       depensesMensuelles: 0,
+      precautionSouhaitee: 0,    // épargne de précaution choisie par le foyer (€)
       tmi: 0.30,
       capaciteMensuelle: 0,
       profilInvest: 'equilibre',  // prudent | equilibre | dynamique | offensif (foyer)
@@ -41,20 +42,22 @@
     },
     projProfils: { prudent: 3.0, equilibre: 5.5, dynamique: 7.5, offensif: 10.0 },
     projHorizons: [5, 10, 15, 20, 25, 30],
-    av: { fraisGestionCible: 0.5, fraisUCCible: 0.2, fraisVersementCible: 0 },
+    av: { fraisGestionUCCible: 0.5, fraisGestionFECible: 0.6, fraisUCCible: 0.3, fraisVersementCible: 0 },
     per: { tauxPlafond: 10, plafondMax: 35194 }, // % des revenus · plafond PASS 2025
     fiscal: { pfuIR: 12.8, prelevementsSociaux: 17.2, abattementAVSeul: 4600, abattementAVCouple: 9200 },
-    precaution: { moisMin: 3, moisMax: 6, moisBase: 6 },
-    projection: { annees: 15 },
+    precaution: { moisMin: 3, moisMax: 6 },
+    over10ans: 10, // horizon du « manque à gagner cumulé » affiché en synthèse
   };
 
   // produits disponibles dans la saisie
   window.PRODUITS_EPARGNE = ['Livret A', 'LDDS', 'LEP', 'CEL', 'Livret Jeune', 'PEL', 'Compte courant', 'Autre liquidité'];
+  // livrets réglementés : un seul par personne
+  window.LIVRETS_UNIQUES = ['Livret A', 'LDDS', 'LEP', 'CEL', 'Livret Jeune', 'PEL'];
   window.TYPES_ENVELOPPE = ['PEA', 'Compte-titres (CTO)', 'PER', "Plan épargne entreprise (PEE)"];
 
   window.newEpargne = () => ({ id: uid('ep'), owner: 'p1', type: 'Livret A', montant: 0, taux: 1.5, versementMensuel: 0 });
-  window.newAv = () => ({ id: uid('av'), owner: 'p1', libelle: 'Contrat', encours: 0, fraisGestion: 1.0, fraisUC: 1.2, fraisVersement: 0, versementMensuel: 0, anciennete: 0 });
-  window.newEnveloppe = () => ({ id: uid('en'), owner: 'p1', type: 'PEA', montant: 0, anciennete: 0, performance: 4.0, versementMensuel: 0, perVerseAnnuel: 0 });
+  window.newAv = () => ({ id: uid('av'), owner: 'p1', libelle: 'Contrat', encours: 0, fraisGestionUC: 0.8, fraisGestionFE: 0.6, fraisUC: 1.2, fraisVersement: 0, versementMensuel: 0, anciennete: 0 });
+  window.newEnveloppe = () => ({ id: uid('en'), owner: 'p1', type: 'PEA', montant: 0, anciennete: 0, performance: 0, versementMensuel: 0, perVerseAnnuel: 0 });
   window.newLivret = () => ({ id: uid('lv'), name: 'Nouveau produit', taux: 0, plafond: 0 });
 
   /* Métadonnées d'affichage des 4 fuites */

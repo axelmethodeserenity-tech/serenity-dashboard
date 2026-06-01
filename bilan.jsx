@@ -29,12 +29,14 @@ function BilanView({ setView, audit, projHorizon }) {
 
   const sections = [
     { n: '01', title: 'Épargne dormante', color: '#E8A24D',
-      note: <>Une épargne de précaution de <b>3 à 6 mois</b> de dépenses ({eur(d.precautionMin)} à {eur(d.precaution)}) suffit.
-        Vos liquidités s'élèvent à {eur(d.liquidites)} : le surplus de <b>{eur(d.surplus)}</b> et l'épargne récurrente versée sur des livrets
-        ({eur(d.epargneRecurrenteAnnuelle)}/an) ne travaillent pas au rythme d'un profil {profilNom} (~{r1(d.targetRate)} %/an).</>,
+      note: <>L'Autorité des marchés financiers recommande de conserver l'équivalent de <b>3 à 6 mois</b> de
+        dépenses essentielles ({eur(d.precautionMin)} à {eur(d.precautionMax)}) — suffisant pour la plupart des foyers.
+        Pour vous sentir en sécurité, vous avez choisi de garder <b>{eur(d.precaution)}</b> : c'est ce montant que
+        nous retenons. Vos liquidités s'élèvent à <b>{eur(d.liquidites)}</b> ; le surplus de <b>{eur(d.surplus)}</b> au-delà
+        de cette précaution ne travaille pas au rythme d'un profil {profilNom} (~{r1(d.targetRate)} %/an) que vous avez choisi.</>,
       rows: [
-        { label: 'Surplus immobilisé', sub: 'au-delà de la précaution', value: eur(d.surplus) },
-        { label: 'Capacité non investie', sub: 'par an', value: eur(d.capaciteAnnuelle) },
+        { label: 'Surplus immobilisé', sub: 'au-delà de votre précaution choisie', value: eur(d.surplus) },
+        { label: 'Épargne récurrente vers les livrets', sub: 'versée chaque année plutôt qu’investie', value: eur(d.epargneRecurrenteAnnuelle) + ' / an' },
         { label: 'Manque à gagner', sub: "coût d'opportunité annuel", value: '+' + eur(d.leak) + ' / an', strong: true },
       ] },
     { n: '02', title: 'Frais d\'assurance-vie', color: '#EC6A56',
@@ -87,19 +89,25 @@ function BilanView({ setView, audit, projHorizon }) {
           <h1 style={{ fontSize: 38, lineHeight: 1.08, letterSpacing: '-.02em', margin: '12px 0 6px' }}>{A.prospect.name}</h1>
           <p style={{ fontSize: 14.5, color: '#5A5F52', margin: 0 }}>
             {A.prospect.situation === 'seul' ? 'Personne seule' : 'Foyer'} · patrimoine financier {eur(A.patrimoine)}</p>
+          <p style={{ fontSize: 15, color: '#3A3F36', margin: '16px 0 0', lineHeight: 1.6, maxWidth: 620 }}>
+            Ce bilan chiffre, poste par poste, ce que votre organisation patrimoniale actuelle vous coûte aujourd'hui —
+            et ce que vous pourriez récupérer en l'optimisant.</p>
 
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 36, margin: '36px 0', padding: '28px 30px', background: '#0C0E12', borderRadius: 14, flexWrap: 'wrap' }}>
-            <div>
-              <div style={{ fontSize: 11, letterSpacing: '.16em', textTransform: 'uppercase', color: '#3FDBC2', fontWeight: 700 }}>Récupérable / an</div>
-              <div className="doc-fig" style={{ fontSize: 46, color: '#5FE9D2', marginTop: 6 }}>+{fmt(A.totals.leakPerYear)} €</div>
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 30, margin: '32px 0', padding: '26px 30px', background: '#0C0E12', borderRadius: 14, flexWrap: 'wrap' }}>
+            <div style={{ minWidth: 150 }}>
+              <div style={{ fontSize: 11, letterSpacing: '.14em', textTransform: 'uppercase', color: '#3FDBC2', fontWeight: 700 }}>Récupérable chaque année</div>
+              <div className="doc-fig" style={{ fontSize: 44, color: '#5FE9D2', marginTop: 6 }}>+{fmt(A.totals.leakPerYear)} €</div>
+              <div style={{ fontSize: 11.5, color: '#8A93A0', marginTop: 4 }}>en optimisant votre patrimoine</div>
             </div>
-            <div style={{ borderLeft: '1px solid rgba(255,255,255,.14)', paddingLeft: 30 }}>
-              <div style={{ fontSize: 12.5, color: '#AAB4C0' }}>Sur 10 ans</div>
+            <div style={{ borderLeft: '1px solid rgba(255,255,255,.14)', paddingLeft: 26, minWidth: 130 }}>
+              <div style={{ fontSize: 12, color: '#AAB4C0', fontWeight: 600 }}>Cumulé sur {A.totals.over10ans} ans</div>
               <div className="doc-fig" style={{ fontSize: 24, color: '#F1F4F7', marginTop: 6 }}>+{eur(A.totals.over10)}</div>
+              <div style={{ fontSize: 11.5, color: '#8A93A0', marginTop: 4 }}>que votre épargne ne vous rapporte pas</div>
             </div>
-            <div>
-              <div style={{ fontSize: 12.5, color: '#AAB4C0' }}>Capital investi en {yEnd}</div>
+            <div style={{ borderLeft: '1px solid rgba(255,255,255,.14)', paddingLeft: 26, minWidth: 130 }}>
+              <div style={{ fontSize: 12, color: '#AAB4C0', fontWeight: 600 }}>Capital placé d'ici {yEnd}</div>
               <div className="doc-fig" style={{ fontSize: 24, color: '#F1F4F7', marginTop: 6 }}>+{eur(projEcart)}</div>
+              <div style={{ fontSize: 11.5, color: '#8A93A0', marginTop: 4 }}>de plus, sur {projH} ans (voir §05)</div>
             </div>
           </div>
 
@@ -117,13 +125,14 @@ function BilanView({ setView, audit, projHorizon }) {
             <h2 style={{ fontSize: 21, marginBottom: 4, display: 'flex', alignItems: 'baseline', gap: 12 }}>
               <span style={{ color: '#5AA2F5', fontVariantNumeric: 'tabular-nums' }}>05</span>Projection de votre capital investi</h2>
             <div className="doc-note" style={{ margin: '14px 0 16px', borderLeftColor: '#5AA2F5' }}>
-              Sur votre patrimoine investi ({eur(A.patrimoineInvesti)}, hors épargne de précaution), une allocation
-              <b> {profilNom} (~{r1(rOpt)} %/an)</b> projetée sur <b>{projH} ans</b> dépasse nettement votre performance
-              actuelle estimée (~{r1(rAct)} %/an). L'écart cumulé illustre le coût, dans le temps, du statu quo.</div>
-            <DocRow label="Capital investi aujourd'hui" sub="hors livrets / précaution" value={eur(A.patrimoineInvesti)} />
-            <DocRow label={`Trajectoire actuelle en ${yEnd}`} sub={`~${r1(rAct)} %/an`} value={eur(projCur)} />
-            <DocRow label={`Trajectoire optimisée en ${yEnd}`} sub={`profil ${profilNom} ~${r1(rOpt)} %/an`} value={eur(projOpt)} />
-            <DocRow label="Écart cumulé" sub={`sur ${projH} ans`} value={'+' + eur(projEcart)} strong />
+              Votre capital déjà investi (<b>{eur(A.patrimoineInvesti)}</b>, hors épargne de précaution) progresse aujourd'hui
+              à environ <b>{r1(rAct)} %/an</b>. Placé sur une allocation {profilNom} (~{r1(rOpt)} %/an), il atteindrait
+              <b> {eur(projOpt)}</b> en {yEnd}, contre {eur(projCur)} en restant sur votre trajectoire actuelle —
+              soit <b>{eur(projEcart)}</b> de différence sur {projH} ans.</div>
+            <DocRow label="Capital placé aujourd'hui" sub="hors livrets et épargne de précaution" value={eur(A.patrimoineInvesti)} />
+            <DocRow label={`En restant comme aujourd'hui (~${r1(rAct)} %/an)`} sub={`valeur estimée en ${yEnd}`} value={eur(projCur)} />
+            <DocRow label={`Avec une allocation ${profilNom} (~${r1(rOpt)} %/an)`} sub={`valeur estimée en ${yEnd}`} value={eur(projOpt)} />
+            <DocRow label="Ce que vous gagneriez en plus" sub={`d'ici ${yEnd} · ${projH} ans`} value={'+' + eur(projEcart)} strong />
           </div>
 
           <hr className="doc-line" style={{ margin: '32px 0 18px' }} />

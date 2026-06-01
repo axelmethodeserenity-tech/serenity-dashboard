@@ -2,7 +2,7 @@
 const { useState, useEffect, useMemo } = React;
 
 function clone(o) { return JSON.parse(JSON.stringify(o)); }
-const SETTINGS_KEY = 'serenity_settings_v1';
+const SETTINGS_KEY = 'serenity_settings_v3';
 
 function loadSettings() {
   try {
@@ -47,9 +47,20 @@ function App() {
   const factory = { epargne: window.newEpargne, assuranceVie: window.newAv, enveloppes: window.newEnveloppe };
   const setList = (key, op, idOrField, field, val) => setInputs(prev => {
     const next = clone(prev);
-    if (op === 'ADD') { next[key] = [...next[key], factory[key]()]; return next; }
+    if (op === 'ADD') {
+      const item = factory[key]();
+      if (key === 'epargne') {
+        // défaut intelligent : 1er produit réglementé non encore détenu par p1 (sinon compte courant)
+        const used = new Set(next.epargne.filter(e => e.owner === 'p1').map(e => e.type));
+        const pick = window.PRODUITS_EPARGNE.find(p => window.LIVRETS_UNIQUES.includes(p) && !used.has(p)) || 'Compte courant';
+        item.type = pick;
+        const s = (settings.livrets || []).find(l => l.name === pick);
+        item.taux = s ? s.taux : 0;
+      }
+      next[key] = [...next[key], item];
+      return next;
+    }
     if (op === 'DEL') { next[key] = next[key].filter(x => x.id !== idOrField); return next; }
-    // else: op = key name reused — treat as field update: setList(key, id, field, val)
     return next;
   });
   // direct item field update: setList(key, id, field, value)
@@ -80,7 +91,7 @@ function App() {
   else if (view === 'projection') body = <ProjectionView setView={setView} audit={audit} horizon={projHorizon} setHorizon={setProjHorizon} />;
   else if (view === 'bilan') body = <BilanView setView={setView} audit={audit} projHorizon={projHorizon} />;
   else if (view === 'settings') body = <SettingsView settings={settings} setSettings={setSettings} resetSettings={resetSettings} />;
-  else body = <SynthesisView setView={setView} audit={audit} />;
+  else body = <SynthesisView setView={setView} audit={audit} projHorizon={projHorizon} />;
 
   return (
     <div className="app" style={view === 'intro' ? { gridTemplateColumns: '1fr' } : {}}>

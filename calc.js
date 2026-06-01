@@ -20,8 +20,10 @@
     const ep = I.epargne || [];
     const liquidites = ep.reduce((s, a) => s + num(a.montant), 0);
     const pondere = liquidites > 0 ? ep.reduce((s, a) => s + num(a.montant) * num(a.taux), 0) / liquidites : 0;
-    const precaution = num(P.depensesMensuelles) * S.precaution.moisBase;
     const precautionMin = num(P.depensesMensuelles) * S.precaution.moisMin;
+    const precautionMax = num(P.depensesMensuelles) * S.precaution.moisMax;
+    // précaution = montant choisi par le foyer (fallback : 6 mois de dépenses si non renseigné)
+    const precaution = num(P.precautionSouhaitee) > 0 ? num(P.precautionSouhaitee) : precautionMax;
     const surplus = Math.max(0, liquidites - precaution);
     // versements mensuels orientés vers les livrets/liquidités (= la part de la capacité qui dort)
     const versEpargne = ep.reduce((s, a) => s + num(a.versementMensuel), 0);
@@ -34,20 +36,23 @@
     const manqueCapacite = epargneRecurrenteAnnuelle * (cible - pondere) / 100;
     const dormantLeak = Math.max(0, Math.round(manqueSurplus + manqueCapacite));
     const dormant = {
-      liquidites, precaution, precautionMin, surplus,
+      liquidites, precaution, precautionMin, precautionMax, surplus,
       epargneRecurrenteAnnuelle, versEpargneMensuel: versEpargne,
       blendedRate: pondere, targetRate: cible, leak: dormantLeak,
       manqueSurplus: Math.round(manqueSurplus), manqueCapacite: Math.round(manqueCapacite),
       accounts: ep.map(a => ({ ...a, montant: num(a.montant), owner: a.owner, ownerName: ownerName(a.owner) })),
     };
 
-    /* ---------- 2. FRAIS ASSURANCE-VIE ---------- */
+    /* ---------- 2. FRAIS ASSURANCE-VIE ----------
+       Frais de gestion distincts UC / fonds euros + frais des unités de compte.
+       Couche de frais courante (poche dynamique) = gestion UC + frais UC ; comparée à la cible. */
     const avList = I.assuranceVie || [];
-    const feesTarget = S.av.fraisGestionCible + S.av.fraisUCCible;
+    const feesTarget = S.av.fraisGestionUCCible + S.av.fraisUCCible;
     const avContrats = avList.map(c => {
-      const feesCur = num(c.fraisGestion) + num(c.fraisUC);
+      const gestUC = num(c.fraisGestionUC), gestFE = num(c.fraisGestionFE);
+      const feesCur = gestUC + num(c.fraisUC);
       const recovered = Math.max(0, Math.round(num(c.encours) * (feesCur - feesTarget) / 100));
-      return { ...c, encours: num(c.encours), feesCur, feesTarget, recovered, ownerName: ownerName(c.owner) };
+      return { ...c, encours: num(c.encours), gestUC, gestFE, feesCur, feesTarget, recovered, ownerName: ownerName(c.owner) };
     });
     const avEncours = avContrats.reduce((s, c) => s + c.encours, 0);
     const avRecovered = avContrats.reduce((s, c) => s + c.recovered, 0);
@@ -94,7 +99,8 @@
       id, ...M[id], amount: amounts[id], pct: Math.round((amounts[id] / maxA) * 100),
     }));
     const leakPerYear = Object.values(amounts).reduce((s, x) => s + x, 0);
-    const fv = (Math.pow(1 + cible / 100, 10) - 1) / (cible / 100);
+    const overN = S.over10ans || 10;
+    const fv = (Math.pow(1 + cible / 100, overN) - 1) / (cible / 100);
     const over10 = Math.round(leakPerYear * fv);
 
     /* ---------- PATRIMOINE & PROJECTION ---------- */
@@ -126,15 +132,6 @@
       epargne: versEpargne, av: versAv, env: versEnv,
     };
     const y0 = new Date().getFullYear();
-    const rA = S.profils.actuelMoyen / 100, rO = S.profils.optimiseMoyen / 100;
-    const N = S.projection.annees;
-    const current = [], optimized = [];
-    for (let i = 0; i <= N; i++) {
-      current.push(Math.round(patrimoine * Math.pow(1 + rA, i)));
-      optimized.push(Math.round(patrimoine * Math.pow(1 + rO, i)));
-    }
-    const labels = [0, 1, 2, 3].map(k => String(y0 + Math.round(k * N / 3)));
-    const projection = { current, optimized, labels, years: N, rActuel: S.profils.actuelMoyen, rOptimise: S.profils.optimiseMoyen };
 
     return {
       couple, ownerName,
@@ -142,8 +139,8 @@
         name: couple ? `${P.p1Nom || 'Prospect 1'} & ${P.p2Nom || 'Prospect 2'}` : (P.p1Nom || 'Prospect'),
         situation: P.situation, ageP1: P.age, patrimoine,
       },
-      totals: { leakPerYear, over10 },
-      leaks, dormant, av, perf, per, fiscalNotes, projection, patrimoine, patrimoineInvesti,
+      totals: { leakPerYear, over10, over10ans: overN },
+      leaks, dormant, av, perf, per, fiscalNotes, patrimoine, patrimoineInvesti,
       perfActuelle, versements, profilInvest, profilRate: cible, settings: S,
     };
   }

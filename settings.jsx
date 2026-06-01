@@ -61,11 +61,12 @@ function SettingsView({ settings, setSettings, resetSettings }) {
         {/* Assurance-vie cible */}
         <div className="card card-pad">
           <div className="eyebrow" style={{ color: 'var(--fg-3)', marginBottom: 16 }}>Contrat d'assurance-vie optimal (cible)</div>
-          <SetLine label="Frais de gestion" value={S.av.fraisGestionCible} onChange={v => setS('av.fraisGestionCible', v)} />
+          <SetLine label="Frais de gestion (unités de compte)" value={S.av.fraisGestionUCCible} onChange={v => setS('av.fraisGestionUCCible', v)} />
+          <SetLine label="Frais de gestion (fonds en euros)" value={S.av.fraisGestionFECible} onChange={v => setS('av.fraisGestionFECible', v)} />
           <SetLine label="Frais unités de compte" value={S.av.fraisUCCible} onChange={v => setS('av.fraisUCCible', v)} />
           <SetLine label="Frais sur versement" value={S.av.fraisVersementCible} onChange={v => setS('av.fraisVersementCible', v)} last />
           <div style={{ borderTop: '1px solid var(--line-1)', marginTop: 14, paddingTop: 14, fontSize: 13, color: 'var(--fg-3)' }}>
-            Total frais cible : <b style={{ color: 'var(--accent)' }}>{r2(S.av.fraisGestionCible + S.av.fraisUCCible + S.av.fraisVersementCible)} %</b></div>
+            Total frais cible (poche UC) : <b style={{ color: 'var(--accent)' }}>{r2(S.av.fraisGestionUCCible + S.av.fraisUCCible)} %</b></div>
         </div>
 
         {/* PER / fiscalité */}
@@ -78,13 +79,12 @@ function SettingsView({ settings, setSettings, resetSettings }) {
           <SetEuro label="Abattement AV > 8 ans (couple)" value={S.fiscal.abattementAVCouple} onChange={v => setS('fiscal.abattementAVCouple', v)} last />
         </div>
 
-        {/* Précaution & projection */}
+        {/* Précaution & manque à gagner */}
         <div className="card card-pad">
-          <div className="eyebrow" style={{ color: 'var(--fg-3)', marginBottom: 16 }}>Épargne de précaution & projection</div>
-          <SetLine label="Précaution minimale" hint="mois de dépenses" value={S.precaution.moisMin} onChange={v => setS('precaution.moisMin', v)} suffix="mois" step={1} />
-          <SetLine label="Précaution maximale" hint="mois de dépenses" value={S.precaution.moisMax} onChange={v => setS('precaution.moisMax', v)} suffix="mois" step={1} />
-          <SetLine label="Base retenue" hint="pour le surplus dormant" value={S.precaution.moisBase} onChange={v => setS('precaution.moisBase', v)} suffix="mois" step={1} />
-          <SetLine label="Durée de projection" value={S.projection.annees} onChange={v => setS('projection.annees', v)} suffix="ans" step={1} last />
+          <div className="eyebrow" style={{ color: 'var(--fg-3)', marginBottom: 16 }}>Repères de précaution & synthèse</div>
+          <SetLine label="Précaution minimale" hint="mois de dépenses (repère affiché)" value={S.precaution.moisMin} onChange={v => setS('precaution.moisMin', v)} suffix="mois" step={1} />
+          <SetLine label="Précaution maximale" hint="mois de dépenses · défaut si non renseigné" value={S.precaution.moisMax} onChange={v => setS('precaution.moisMax', v)} suffix="mois" step={1} />
+          <SetLine label="Horizon du manque à gagner cumulé" hint="affiché en synthèse (« sur N ans »)" value={S.over10ans} onChange={v => setS('over10ans', v)} suffix="ans" step={1} last />
         </div>
       </div>
     </div>
