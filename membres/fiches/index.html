@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Fiches mémo SERENITY</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:wght@400&family=Manrope:wght@500;600;700&display=swap">
+<style>
+/* Fond transparent : intégrée dans une leçon, la page laisse voir le fond de Systeme.io autour de la carte. */
+*{box-sizing:border-box}
+html,body{margin:0;background:transparent}
+body{font-family:'Manrope',system-ui,-apple-system,'Segoe UI',sans-serif;-webkit-font-smoothing:antialiased;padding:4px}
+.top-level{min-height:100vh;display:grid;place-items:center;padding:24px 16px;background:#0C0E12}
+.card{--c:#3FDBC2;--ink:#04201C;width:100%;max-width:760px;margin:0 auto;background:linear-gradient(168deg,#141821,#0f1217);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:14px 18px;color:#F1F4F7}
+.info{display:flex;align-items:center;gap:13px;min-width:0}
+.ring{width:16px;height:16px;border-radius:50%;border:3px solid var(--c);flex:none}
+.t{margin:0;font-family:'Spectral',Georgia,serif;font-size:19px;line-height:1.2}
+.s{margin:3px 0 0;font-size:12.5px;line-height:1.4;color:#B3BCC7}
+.actions{display:flex;align-items:center;flex-wrap:wrap;gap:8px 16px;margin-top:12px}
+.dl{display:inline-flex;align-items:center;justify-content:center;gap:9px;flex:none;border-radius:999px;padding:11px 20px;background:var(--c);color:var(--ink);font:inherit;font-weight:700;font-size:14.5px;text-decoration:none;border:0;cursor:pointer;transition:filter .2s,transform .2s}
+.dl:hover{filter:brightness(1.06);transform:translateY(-1px)}
+.dl[aria-disabled="true"]{opacity:.6;cursor:progress;transform:none;filter:none}
+.dl svg{flex:none}
+.msg{margin:0;font-size:12.5px;line-height:1.45;color:#B3BCC7}
+.msg.err{color:#E8A24D}
+.msg a{color:#F1F4F7;text-decoration:underline;text-decoration-color:rgba(255,255,255,.35);text-underline-offset:2px}
+[hidden]{display:none !important}
+:focus-visible{outline:2px solid var(--c);outline-offset:3px}
+@media (max-width:440px){
+  .card{padding:14px}
+  .dl{width:100%}
+  .date{display:none}
+}
+</style>
+</head>
+<body>
+<main class="card" id="card" aria-live="polite">
+  <div class="info">
+    <span class="ring" aria-hidden="true"></span>
+    <div><p class="t" id="titre">Fiches mémo SERENITY</p><p class="s"><span id="detail"></span><span class="date" id="date"></span></p></div>
+  </div>
+  <div class="actions">
+    <a class="dl" id="dl" href="#" aria-disabled="true" role="button">
+      <span id="dlTexte">Préparation…</span>
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>
+    </a>
+    <p class="msg" id="msg" hidden></p>
+  </div>
+</main>
+<script>
+(function(){
+  'use strict';
+  var F = {"pea": {"titre": "Fiches mémo PEA", "nb": 11, "taille": "1,3 Mo", "maj": "30 septembre 2026", "fichier": "SERENITY - Fiches PEA.pdf", "couleur": "#FF8FAB", "encre": "#2B0D16", "url": "pea.bin"}};
+  var KEY = 'serenity-membres-k';
+  var te = new TextEncoder();
+  var $ = function(id){ return document.getElementById(id); };
+  var card = $('card'), dl = $('dl'), msg = $('msg');
+
+  function b64(s){ var bin = atob(s), out = new Uint8Array(bin.length); for(var i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i); return out; }
+  function tob64(u8){ var s = ''; for(var i = 0; i < u8.length; i++) s += String.fromCharCode(u8[i]); return btoa(s); }
+  function fromB64url(s){ s = s.replace(/-/g, '+').replace(/_/g, '/'); while(s.length % 4) s += '='; return b64(s); }
+  function tob64url(u8){ return tob64(u8).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
+  function stored(){ try { var v = localStorage.getItem(KEY); return v ? b64(v) : null; } catch(e) { return null; } }
+  function remember(k){ try { localStorage.setItem(KEY, tob64(k)); } catch(e) {} }
+  var integre = (function(){ try { return window.self !== window.top; } catch(e) { return true; } })();
+  if(!integre) document.body.classList.add('top-level');
+
+  /* Adresse : #cle=<clé des membres>&<famille>, avec &go pour lancer le téléchargement à l'ouverture. */
+  var parts = (location.hash || '').replace(/^#/, '').split('&'), cleTexte = null, code = null, go = false;
+  for(var i = 0; i < parts.length; i++){
+    if(parts[i].indexOf('cle=') === 0) cleTexte = parts[i].slice(4);
+    else if(parts[i] === 'go') go = true;
+    else if(F && F[parts[i]]) code = parts[i];
+  }
+  if(cleTexte){ try { history.replaceState(null, '', location.pathname + location.search + (code ? '#' + code : '')); } catch(e) {} }
+  if(!F) return;
+  code = code || Object.keys(F)[0];
+  var fam = F[code];
+  card.style.setProperty('--c', fam.couleur);
+  card.style.setProperty('--ink', fam.encre);
+  $('titre').textContent = fam.titre;
+  $('detail').textContent = fam.nb + ' fiches · PDF · ' + fam.taille;
+  $('date').textContent = ' · à jour du ' + fam.maj;
+  document.title = fam.titre + ' · SERENITY';
+
+  function erreur(texte){
+    dl.hidden = true;
+    msg.hidden = false; msg.className = 'msg err'; msg.textContent = texte;
+  }
+  function ouvrirAilleurs(cle){
+    var url = location.origin + location.pathname + '#cle=' + tob64url(cle) + '&' + code + '&go';
+    var w = window.open(url, '_blank');
+    if(w){ try { w.opener = null; } catch(e) {} return; }
+    try { window.top.location.href = url; } catch(e) { location.href = url; }
+  }
+
+  if(!window.crypto || !crypto.subtle || !window.fetch){
+    return erreur('Votre navigateur ne permet pas ce téléchargement. Essayez avec une version récente de Safari, Chrome ou Firefox.');
+  }
+  var cle = null;
+  try { cle = cleTexte ? fromB64url(cleTexte) : stored(); } catch(e) {}
+  if(!cle) return erreur('Accès réservé aux membres de l’accompagnement : ouvrez les fiches depuis votre espace de formation SERENITY.');
+
+  /* Même chiffrement que le comparateur : AES-256-CBC, authentifié par HMAC sur famille + IV + contenu. */
+  crypto.subtle.importKey('raw', cle, {name:'HMAC', hash:'SHA-256'}, false, ['sign']).then(function(h){
+    return Promise.all([crypto.subtle.sign('HMAC', h, te.encode('serenity-enc')), crypto.subtle.sign('HMAC', h, te.encode('serenity-mac')), fetch(fam.url, {cache:'no-cache'})]);
+  }).then(function(r){
+    if(!r[2].ok) throw new Error('fichier');
+    return r[2].arrayBuffer().then(function(buf){ return [r[0], r[1], new Uint8Array(buf)]; });
+  }).then(function(r){
+    var data = r[2];
+    if(String.fromCharCode(data[0], data[1], data[2], data[3]) !== 'SRN1') throw new Error('format');
+    var iv = data.slice(4, 20), mac = data.slice(20, 52), ct = data.slice(52);
+    var lab = te.encode(code), signe = new Uint8Array(lab.length + iv.length + ct.length);
+    signe.set(lab); signe.set(iv, lab.length); signe.set(ct, lab.length + iv.length);
+    return crypto.subtle.importKey('raw', r[1], {name:'HMAC', hash:'SHA-256'}, false, ['verify']).then(function(mk){
+      return crypto.subtle.verify('HMAC', mk, mac, signe);
+    }).then(function(ok){
+      if(!ok) throw new Error('cle');
+      return crypto.subtle.importKey('raw', r[0], {name:'AES-CBC'}, false, ['decrypt']);
+    }).then(function(ek){ return crypto.subtle.decrypt({name:'AES-CBC', iv:iv}, ek, ct); });
+  }).then(function(pdf){
+    if(cleTexte) remember(cle);
+    dl.href = URL.createObjectURL(new Blob([pdf], {type:'application/pdf'}));
+    dl.setAttribute('download', fam.fichier);
+    dl.removeAttribute('aria-disabled');
+    dl.removeAttribute('role');
+    $('dlTexte').textContent = 'Télécharger les fiches';
+    if(integre){
+      msg.hidden = false;
+      msg.innerHTML = 'Rien ne se passe ? <a href="#" id="ailleurs">Ouvrir dans un nouvel onglet</a>';
+      $('ailleurs').addEventListener('click', function(e){ e.preventDefault(); ouvrirAilleurs(cle); });
+    } else if(go){
+      dl.click();
+    }
+  }).catch(function(e){
+    if(e && e.message === 'cle') erreur('Ce lien n’est plus valable : ouvrez les fiches depuis votre espace de formation SERENITY.');
+    else erreur('Le téléchargement n’a pas pu être préparé. Rechargez la page, ou ouvrez les fiches depuis votre espace de formation.');
+  });
+
+  dl.addEventListener('click', function(e){ if(dl.getAttribute('aria-disabled') === 'true') e.preventDefault(); });
+})();
+</script>
+</body>
+</html>
