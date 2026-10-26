@@ -32,8 +32,12 @@ body{font-family:'Manrope',system-ui,-apple-system,'Segoe UI',sans-serif;-webkit
 :focus-visible{outline:2px solid var(--c);outline-offset:3px}
 @media (max-width:440px){
   .card{padding:14px}
+  .t{font-size:clamp(15px,4.6vw,19px)}
   .dl{width:100%}
   .date{display:none}
+}
+@media (max-width:340px){
+  .long{display:none}
 }
 </style>
 </head>
@@ -54,7 +58,7 @@ body{font-family:'Manrope',system-ui,-apple-system,'Segoe UI',sans-serif;-webkit
 <script>
 (function(){
   'use strict';
-  var F = {"pea": {"titre": "Fiches mémo PEA", "nb": 11, "taille": "1,3 Mo", "maj": "30 septembre 2026", "fichier": "SERENITY - Fiches PEA.pdf", "couleur": "#FF8FAB", "encre": "#2B0D16", "url": "pea.bin"}};
+  var F = {"pea": {"titre": "Fiches mémo PEA", "nom": "PEA", "nb": 11, "taille": "1,3 Mo", "maj": "30 septembre 2026", "fichier": "SERENITY - Fiches PEA.pdf", "couleur": "#FF8FAB", "encre": "#2B0D16", "url": "pea.bin"}, "av": {"titre": "Fiches mémo Assurance-vie", "nom": "Assurance-vie", "nb": 12, "taille": "1,4 Mo", "maj": "30 septembre 2026", "fichier": "SERENITY - Fiches Assurance-vie.pdf", "couleur": "#C5E478", "encre": "#18200A", "url": "av.bin"}, "es": {"titre": "Fiches mémo Épargne salariale", "nom": "Épargne salariale", "nb": 12, "taille": "1,3 Mo", "maj": "9 octobre 2026", "fichier": "SERENITY - Fiches Épargne salariale.pdf", "couleur": "#E089F5", "encre": "#2A0B30", "url": "es.bin"}};
   var KEY = 'serenity-membres-k';
   var te = new TextEncoder();
   var $ = function(id){ return document.getElementById(id); };
@@ -82,8 +86,8 @@ body{font-family:'Manrope',system-ui,-apple-system,'Segoe UI',sans-serif;-webkit
   var fam = F[code];
   card.style.setProperty('--c', fam.couleur);
   card.style.setProperty('--ink', fam.encre);
-  $('titre').textContent = fam.titre;
-  $('detail').textContent = fam.nb + ' fiches · PDF · ' + fam.taille;
+  $('titre').textContent = fam.nom;
+  $('detail').textContent = fam.nb + ' fiches mémo · PDF · ' + fam.taille;
   $('date').textContent = ' · à jour du ' + fam.maj;
   document.title = fam.titre + ' · SERENITY';
 
@@ -129,10 +133,10 @@ body{font-family:'Manrope',system-ui,-apple-system,'Segoe UI',sans-serif;-webkit
     dl.setAttribute('download', fam.fichier);
     dl.removeAttribute('aria-disabled');
     dl.removeAttribute('role');
-    $('dlTexte').textContent = 'Télécharger les fiches';
+    $('dlTexte').innerHTML = 'Télécharger<span class="long"> les fiches</span>';
     if(integre){
       msg.hidden = false;
-      msg.innerHTML = 'Rien ne se passe ? <a href="#" id="ailleurs">Ouvrir dans un nouvel onglet</a>';
+      msg.innerHTML = '<span class="long">Rien ne se passe ? </span><a href="#" id="ailleurs">Ouvrir dans un nouvel onglet</a>';
       $('ailleurs').addEventListener('click', function(e){ e.preventDefault(); ouvrirAilleurs(cle); });
     } else if(go){
       dl.click();
